@@ -1,12 +1,13 @@
 import streamlit as st
 import uuid  # To generate unique session IDs
 from snowflake.snowpark import Session
-from snowflake.cortex import Complete
+from snowflake.cortex import complete
 from snowflake.core import Root
 import pandas as pd
 import json
 from dotenv import load_dotenv
 import os
+
 
 # Load environment variables from .env file
 load_dotenv()
@@ -21,6 +22,19 @@ connection_params = {
     "schema": os.getenv("SNOWFLAKE_SCHEMA"),
     "warehouse": os.getenv("SNOWFLAKE_WAREHOUSE"),
 }
+st.markdown(
+    """
+    <style>
+        
+        /* Sidebar styling */
+        section[data-testid="stSidebar"] {
+            background-color:rgb(216, 248, 234) !important;
+        }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 
 CORTEX_SEARCH_DATABASE = "CORTEX_SEARCH_DOCS"
 CORTEX_SEARCH_SCHEMA = "DATA"
@@ -29,7 +43,7 @@ CORTEX_SEARCH_SERVICE = "CC_SEARCH_SERVICE_CS"
 # Default configurations
 NUM_CHUNKS = 9
 SLIDE_WINDOW = 7
-RED_FLAGS = ["suicide", "harm", "hopeless", "kill myself", "worthless", "cut myself"]
+RED_FLAGS = []
 
 ### Helper Functions
 def config_options():
@@ -85,8 +99,8 @@ def analyze_red_flags(user_input):
         if flag in user_input.lower():
             return (
                 True,
-                "I'm really sorry you're feeling this way. You're not alone, and help is available. "
-                "Please consider reaching out to a trusted individual or a helpline. The sidebar has a list of Mental Health Helplines."
+                "I'm really sorry you're feeling this way. You're not alone, and help is available. It's important to me that you're safe. Can you tell me more about what's been making you feel this way? And please, if you're in immediate danger, contact emergency services in your area. They have trained professionals available 24/7 to help you."
+                "Please consider reaching out to a trusted individual or a helpline. Please talk to me before taking any action. The sidebar has a list of Mental Health Helplines."
             )
     return False, ""
 
@@ -117,7 +131,7 @@ def summarize_chat_history(chat_history, question):
         Only return the summary query.
     """
     # Pass the Snowflake session explicitly
-    summary = Complete("mistral-large2", prompt, session=st.session_state["global_snowflake_session"])
+    summary = complete("mistral-large2", prompt, session=st.session_state["global_snowflake_session"])
     return summary.strip()
 
 def create_prompt(user_input, session_id, svc):
@@ -131,7 +145,7 @@ def create_prompt(user_input, session_id, svc):
 
     prompt = f"""
         You are a compassionate and experienced psychiatrist who provides tailored and empathetic responses. 
-        Use the CONTEXT below to assist the user. Speak naturally, compassionately, and with sensitivity.
+        Use the CONTEXT below to assist the user. Speak naturally, compassionately, and with sensitivity. Please dont assume anything about relations. Only refer to chat history if there are any relations.
 
         CHAT HISTORY:
         {chat_history}
@@ -158,13 +172,13 @@ def generate_response(user_input, session_id, svc):
     # Generate main response
     prompt, relative_paths = create_prompt(user_input, session_id, svc)
     # Pass the Snowflake session explicitly
-    response = Complete("mistral-large2", prompt, session=st.session_state["global_snowflake_session"])
+    response = complete("mistral-large2", prompt, session=st.session_state["global_snowflake_session"])
     return response.strip()
 
 ### Main Application
 
 def main():
-    st.title(":speech_balloon: Emotional Health Support Chatbot")
+    st.title(":speech_balloon: EmotiAI Support Chatbot")
     st.markdown("Welcome to the Emotional Health Support Chatbot. This is a safe space to share your feelings. ❤️")
 
     # Sidebar for configuration options
