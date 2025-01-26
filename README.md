@@ -53,7 +53,12 @@ for Windows Powershell:
 for Windows Powershell:
    1) pip install -r requirements.txt
 
-### Step 4: Create .env file and enter your snowflake account details
+## Step 4: Create Database and schema in Snowflake and a Cortex Search service
+
+1. Create a vast collection of Cognitive Behavioural therapy guides and research and create chunks in the database.
+2. Refer to this link to create database and search services - https://quickstarts.snowflake.com/guide/ask_questions_to_your_own_documents_with_snowflake_cortex_search/#0
+
+### Step 5: Create .env file and enter your snowflake account details
 SNOWFLAKE_USER=<br>
 SNOWFLAKE_USER_PASSWORD=<br>
 SNOWFLAKE_ACCOUNT=<br>
@@ -63,4 +68,6 @@ SNOWFLAKE_WAREHOUSE=<br>
 SNOWFLAKE_ROLE=<br>
 SNOWFLAKE_CORTEX_SEARCH_SERVICE=<br>
 
-### Step 5: streamlit run file.py
+### Step 6: streamlit run file.py
+
+
